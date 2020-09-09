@@ -8,12 +8,12 @@ from mtcnn.mtcnn import MTCNN
 import os
 import time
 
-filename = 'crowd3.jpg'
+filename = 'obama.jpg'
 model = 'mtcnn'
 scale = 1
 
 detector = MTCNN()
-raw_img = cv2.imread(os.path.join('TestImg',filename))
+raw_img = cv2.imread(os.path.join('TestImg', filename))
 img = cv2.cvtColor(raw_img, cv2.COLOR_BGR2RGB)
 
 t0 = time.time()
@@ -21,7 +21,7 @@ print('start')
 face_locations = detector.detect_faces(img)
 t1 = time.time()
 print(f'took {round(t1-t0, 3)} to get {len(face_locations)} faces')
-
+print(face_locations)
 for loc in face_locations:
     (x, y, w, h) = loc['box']
     cv2.rectangle(raw_img, (x,y), (x+w,y+h), (80,18,236), 2)

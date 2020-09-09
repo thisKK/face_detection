@@ -41,7 +41,7 @@ def predict(width, height, confidences, boxes, prob_threshold, iou_threshold=0.5
     return picked_box_probs[:, :4].astype(np.int32), np.array(picked_labels), picked_box_probs[:, 4]
 
 
-filename = 'crowd.jpg'
+filename = 'test8.jpg'
 model = 'ultra-light'
 scale = 1
 
@@ -54,7 +54,7 @@ ort_session = ort.InferenceSession(onnx_path)
 
 input_name = ort_session.get_inputs()[0].name
 
-raw_img = cv2.imread(os.path.join('TestImg',filename))
+raw_img = cv2.imread(os.path.join('TestImg', filename))
 h, w, _ = raw_img.shape
 img = cv2.cvtColor(raw_img, cv2.COLOR_BGR2RGB)
 img = cv2.resize(img, (640, 480))
@@ -72,7 +72,7 @@ print(f"took {round(t1-t0, 3)} to get {boxes.shape[0]} faces")
 
 for i in range(boxes.shape[0]):
     box = boxes[i, :]
-    cv2.rectangle(raw_img, (box[0], box[1]), (box[2], box[3]), (80,18,236), 2)
+    cv2.rectangle(raw_img, (box[0], box[1]), (box[2], box[3]), (80, 18, 236), 2)
 
 font = cv2.FONT_HERSHEY_DUPLEX
 text = f'took {round(t1-t0, 3)} to get {boxes.shape[0]} faces'

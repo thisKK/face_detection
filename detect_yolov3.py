@@ -7,11 +7,9 @@ import cv2
 import os
 import time
 import numpy as np
-
-filename = 'crowd3.jpg'
+filename = 'marvel_class_photo.jpg'
 model = 'yolov3-face'
 scale = 1
-
 IMG_WIDTH, IMG_HEIGHT = 416, 416
 CONFIDENCE = 0.5
 THRESH = 0.3
@@ -20,10 +18,10 @@ net = cv2.dnn.readNetFromDarknet("Yolo/yolo_models/yolov3-face.cfg", "Yolo/yolo_
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
-raw_img = cv2.imread(os.path.join('TestImg',filename))
+raw_img = cv2.imread(os.path.join('TestImg', filename))
 h, w, _ = raw_img.shape
 # img = cv2.cvtColor(raw_img, cv2.COLOR_BGR2RGB)
-
+count = 0
 # inference
 t0 = time.time()
 
@@ -50,6 +48,10 @@ for out in outs:
             boxes.append([x, y, int(bwidth), int(bheight)])
             confidences.append(float(confidence))
             class_ids.append(class_id)
+            cropped = raw_img[y:y+bheight, x:x+bwidth]
+            newimg = cv2.resize(cropped, (112, 112))
+            count += 1
+            cv2.imwrite("./cropped_face/face_" + str(count) + ".jpg", newimg)
 # Apply Non-Maxima Suppression to suppress overlapping bounding boxes
 idxs = cv2.dnn.NMSBoxes(boxes, confidences, CONFIDENCE, THRESH)
 
@@ -63,7 +65,6 @@ for i in idxs.flatten():
     x, y = boxes[i][0], boxes[i][1]
     w, h = boxes[i][2], boxes[i][3]
     cv2.rectangle(raw_img, (x,y), (x+w,y+h), (80,18,236), 2)
-
 font = cv2.FONT_HERSHEY_DUPLEX
 text = f'took {round(t1-t0, 3)} to get {len(idxs.flatten())} faces'
 cv2.putText(raw_img, text, (20, 20), font, 0.5, (255, 255, 255), 1)

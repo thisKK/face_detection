@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
-# @Author: fyr91
-# @Date:   2019-10-22 15:05:15
-# @Last Modified by:   fyr91
-# @Last Modified time: 2019-10-31 12:38:02
 import cv2
 import dlib
 import numpy as np
 from imutils import face_utils
 from box_utils import *
-
+import pickle
 import onnx
 import onnxruntime as ort
 from onnx_tf.backend import prepare
 
-video_capture = cv2.VideoCapture('./TestVideo/maskon.mp4')
+video_capture = cv2.VideoCapture('./test.mp4')
 
 onnx_path = 'UltraLight/models/ultra_light_640.onnx'
 onnx_model = onnx.load(onnx_path)
@@ -21,8 +16,12 @@ predictor = prepare(onnx_model)
 ort_session = ort.InferenceSession(onnx_path)
 input_name = ort_session.get_inputs()[0].name
 
-shape_predictor = dlib.shape_predictor('FacialLandmarks/shape_predictor_5_face_landmarks.dat')
+shape_predictor = dlib.shape_predictor('FacialLandmarks/shape_predictor_68_face_landmarks.dat')
 fa = face_utils.facealigner.FaceAligner(shape_predictor, desiredFaceWidth=112, desiredLeftEye=(0.3, 0.3))
+
+model = dlib.face_recognition_model_v1('./facerecognition/dlib_face_recognition_resnet_model_v1.dat')
+
+FACE_DESC, FACE_NAME = pickle.load(open('./facerecognition/trainset.pk', 'rb'))
 
 while True:
     ret, frame = video_capture.read()
@@ -45,12 +44,12 @@ while True:
             box = boxes[i, :]
             x1, y1, x2, y2 = box
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            shape = shape_predictor(gray, dlib.rectangle(left = x1, top=y1, right=x2, bottom=y2))
+            shape = shape_predictor(gray, dlib.rectangle(left=x1, top=y1, right=x2, bottom=y2))
             shape = face_utils.shape_to_np(shape)
             for (x, y) in shape:
-                cv2.circle(frame, (x, y), 2, (80,18,236), -1)
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (80,18,236), 2)
-            cv2.rectangle(frame, (x1, y2 - 20), (x2, y2), (80,18,236), cv2.FILLED)
+                cv2.circle(frame, (x, y), 2, (80, 18, 236), -1)
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (80, 18, 236), 2)
+            cv2.rectangle(frame, (x1, y2 - 20), (x2, y2), (80, 18, 236), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             text = f"Face: {round(probs[i], 2)}"
             cv2.putText(frame, text, (x1 + 6, y2 - 6), font, 0.3, (255, 255, 255), 1)

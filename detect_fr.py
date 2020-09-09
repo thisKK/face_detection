@@ -8,12 +8,13 @@ import cv2
 import os
 import time
 
-filename = 'crowd.jpg'
+filename = 'test8.jpg'
 model = 'hog'
 scale = 1
 
-raw_img = cv2.imread(os.path.join('TestImg',filename))
+raw_img = cv2.imread(os.path.join('TestImg', filename))
 img = raw_img[:, :, ::-1]
+#img = cv2.cvtColor(raw_img, cv2.COLOR_GRAY2RGB)
 
 t0 = time.time()
 print('start')
